@@ -1,0 +1,92 @@
+[
+  {
+    "title": "SDE-2 Backend Engineer",
+    "company": "FinPay (Fintech product)",
+    "location": "Bangalore",
+    "remote": "hybrid",
+    "salary_band": "28-38 LPA",
+    "tech": ["Java", "Spring Boot", "Kafka", "Kubernetes", "PostgreSQL", "AWS"],
+    "jd_text": "Build and own payment microservices handling millions of transactions/day. Strong Java + Spring Boot, event-driven systems (Kafka), and production ownership required. You will design for scale, reliability, and low latency. Kubernetes and observability experience strongly preferred. 3-6 years experience."
+  },
+  {
+    "title": "Full-Stack Engineer",
+    "company": "BrightDesk (Series B SaaS)",
+    "location": "Remote (India)",
+    "remote": "remote",
+    "salary_band": "22-30 LPA",
+    "tech": ["Node.js", "React", "TypeScript", "PostgreSQL", "AWS"],
+    "jd_text": "Own features end-to-end across a modern TypeScript stack. Comfortable with React on the frontend and Node services on the backend. We value strong product sense, fast iteration, and good work-life balance. Any prior full-stack deployment experience (personal projects count) is a plus. 2-5 years."
+  },
+  {
+    "title": "Platform Engineer",
+    "company": "Scalaris (Mid-size product)",
+    "location": "Bangalore",
+    "remote": "onsite",
+    "salary_band": "25-35 LPA",
+    "tech": ["Go", "Kubernetes", "Terraform", "AWS", "Docker"],
+    "jd_text": "Build internal platform and CI/CD tooling. Deep Kubernetes, IaC (Terraform), and cloud experience required. You will improve developer productivity and reliability across teams. Strong Linux and container fundamentals. 4-8 years."
+  },
+  {
+    "title": "Backend Engineer (Java)",
+    "company": "RetailCloud (E-commerce product)",
+    "location": "Bangalore",
+    "remote": "hybrid",
+    "salary_band": "24-32 LPA",
+    "tech": ["Java", "Spring Boot", "MySQL", "Redis", "AWS"],
+    "jd_text": "Develop high-throughput backend services for an e-commerce platform. Spring Boot microservices, caching (Redis), and SQL optimization. You will work on cart, checkout, and order systems. Experience improving latency and throughput is highly valued. 3-5 years."
+  },
+  {
+    "title": "Senior Software Engineer - Microservices",
+    "company": "Lumen Health (HealthTech)",
+    "location": "Pune",
+    "remote": "hybrid",
+    "salary_band": "30-40 LPA",
+    "tech": ["Java", "Spring Boot", "Kubernetes", "Kafka", "GCP"],
+    "jd_text": "Lead design of distributed microservices for healthcare data. Requires strong system design, event-driven architecture, and mentoring ability. Kubernetes and cloud-native patterns expected. You will set technical direction for a small team. 5-8 years."
+  },
+  {
+    "title": "Software Engineer - Full Stack",
+    "company": "Kite (Early-stage startup)",
+    "location": "Remote (India)",
+    "remote": "remote",
+    "salary_band": "18-26 LPA",
+    "tech": ["Angular", "Spring Boot", "PostgreSQL", "Docker"],
+    "jd_text": "Wear many hats at an early-stage startup. Angular + Spring Boot full-stack development, fast shipping, and direct user impact. Great for someone who wants ownership and breadth. Equity offered. 2-5 years."
+  },
+  {
+    "title": "Backend Engineer - Payments",
+    "company": "PayArc (Fintech)",
+    "location": "Bangalore",
+    "remote": "hybrid",
+    "salary_band": "26-36 LPA",
+    "tech": ["Java", "Spring Boot", "Kafka", "MySQL", "AWS"],
+    "jd_text": "Work on core payments and settlement systems. Strong Java, transactional correctness, and reliability mindset. Experience with high-volume transaction systems and query optimization is a strong plus. 3-6 years."
+  },
+  {
+    "title": "Cloud/DevOps Engineer",
+    "company": "Nimbus (Infra startup)",
+    "location": "Remote (India)",
+    "remote": "remote",
+    "salary_band": "24-34 LPA",
+    "tech": ["AWS", "Kubernetes", "Terraform", "Python", "CI/CD"],
+    "jd_text": "Own cloud infrastructure and deployment pipelines. Deep AWS, Kubernetes, and Terraform required. Strong scripting (Python/Bash). This is an infra-heavy role for someone who lives in the cloud. 3-6 years."
+  },
+  {
+    "title": "SDE-2 Product Engineer",
+    "company": "Northstar (Product company)",
+    "location": "Bangalore",
+    "remote": "hybrid",
+    "salary_band": "28-40 LPA",
+    "tech": ["Java", "Spring Boot", "React", "AWS", "System Design"],
+    "jd_text": "Own product features end-to-end with strong emphasis on system design and code quality. Java backend with some frontend. We interview heavily on system design (URL shortener, rate limiter, feed). Mentoring juniors is part of the role. 3-6 years."
+  },
+  {
+    "title": "Java Developer - Enterprise",
+    "company": "CoreSoft Services",
+    "location": "Hyderabad",
+    "remote": "onsite",
+    "salary_band": "12-18 LPA",
+    "tech": ["Java", "Spring", "Oracle", "JSP"],
+    "jd_text": "Maintain and enhance enterprise Java applications for banking clients. Java 8, Spring, Oracle. Stable role in a large services company. Limited greenfield work; mostly maintenance and enhancements. 2-6 years."
+  }
+]

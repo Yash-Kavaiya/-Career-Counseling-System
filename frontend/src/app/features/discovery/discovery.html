@@ -1,0 +1,113 @@
+<section class="mx-auto max-w-6xl px-5 sm:px-8 py-8">
+  <div class="flex items-center justify-between gap-3 flex-wrap mb-6">
+    <div>
+      <div class="gb-chip mb-2"><span class="w-2 h-2 rounded-full gb-gradient"></span> Step 2 · Discovery</div>
+      <h1 class="gb-headline text-3xl sm:text-4xl">Let's fill in the gaps</h1>
+    </div>
+    @if (state()) {
+      <a routerLink="/assessment" class="gb-btn-ghost gb-sm group">See assessment <span class="gb-arrow">&rarr;</span></a>
+    }
+  </div>
+
+  @if (error()) {
+    <div class="mb-5 rounded-2xl bg-red-50 text-red-700 text-sm px-4 py-3 border border-red-100">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="py-20 text-center text-gray-400">Loading your conversation…</div>
+  } @else if (noProfile()) {
+    <div class="gb-card p-10 text-center max-w-xl mx-auto">
+      <h2 class="gb-display text-xl mb-2">First, add your resume</h2>
+      <p class="text-gray-500 mb-6">Discovery builds on your parsed profile. Add it and we'll pick up from there.</p>
+      <a routerLink="/resume" class="gb-btn group">Go to resume <span class="gb-arrow">&rarr;</span></a>
+    </div>
+  } @else if (!state()) {
+    <!-- Start screen -->
+    <div class="gb-card p-10 text-center max-w-2xl mx-auto gb-rise">
+      <div class="gb-gradient w-14 h-14 rounded-2xl flex items-center justify-center text-white mx-auto mb-5">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 1 1-4.5-7.8L21 3v6h-6"/></svg>
+      </div>
+      <h2 class="gb-display text-xl mb-2">Ready when you are</h2>
+      <p class="text-gray-500 mb-6 max-w-md mx-auto">Your counselor read your resume and has a few sharp, specific questions — one at a time, never repeated.</p>
+      <button class="gb-btn gb-lg group" [disabled]="starting()" (click)="start()">
+        @if (starting()) { <span>Preparing your first question…</span> } @else { <span>Begin discovery</span> <span class="gb-arrow">&rarr;</span> }
+      </button>
+    </div>
+  } @else {
+    <!-- Chat + coverage -->
+    <div class="grid lg:grid-cols-3 gap-6">
+      <!-- Chat -->
+      <div class="lg:col-span-2 gb-card flex flex-col h-[68vh]">
+        <div #scroller class="flex-1 overflow-y-auto p-5 space-y-4">
+          @for (m of messages(); track $index) {
+            @if (m.role === 'assistant') {
+              <div class="flex gap-3">
+                <span class="gb-gradient w-8 h-8 rounded-xl flex items-center justify-center text-white text-sm shrink-0 mt-0.5">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </span>
+                <div class="max-w-[85%] rounded-2xl rounded-tl-sm bg-gray-50 border border-gray-100 px-4 py-2.5 text-[15px] leading-relaxed whitespace-pre-wrap">{{ m.content }}@if (streaming() && $last && !m.content) {<span class="text-gray-400">thinking…</span>}@if (streaming() && $last && m.content) {<span class="inline-block w-1.5 h-4 align-middle bg-gb-mint/70 ml-0.5 animate-pulse"></span>}</div>
+              </div>
+            } @else {
+              <div class="flex justify-end">
+                <div class="max-w-[85%] rounded-2xl rounded-tr-sm gb-gradient text-white px-4 py-2.5 text-[15px] leading-relaxed whitespace-pre-wrap">{{ m.content }}</div>
+              </div>
+            }
+          }
+        </div>
+        <div class="border-t border-gray-100 p-3">
+          <form (ngSubmit)="send()" class="flex items-end gap-2">
+            <textarea
+              [(ngModel)]="draft" name="draft" rows="1"
+              (keydown.enter)="$event.preventDefault(); send()"
+              [disabled]="streaming()"
+              placeholder="Type your answer…"
+              class="gb-textarea resize-none max-h-32"></textarea>
+            <button type="submit" class="gb-btn shrink-0" [disabled]="streaming() || !draft.trim()">
+              @if (streaming()) {
+                <span class="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></span>
+              } @else {
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              }
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Coverage -->
+      <div class="space-y-5">
+        <div class="gb-card p-5">
+          <div class="flex items-center justify-between mb-1">
+            <h3 class="gb-display text-base">Coverage</h3>
+            <span class="text-sm text-gray-400">{{ coveredCount() }}/{{ totalTopics() }}</span>
+          </div>
+          <div class="h-2 rounded-full bg-gray-100 overflow-hidden mb-4">
+            <div class="h-full gb-gradient transition-all duration-500" [style.width.%]="progress()"></div>
+          </div>
+          <ul class="space-y-2">
+            @for (t of state()!.all_topics; track t.key) {
+              <li class="flex items-start gap-2.5 text-sm" [class.text-gray-400]="!isCovered(t.key)">
+                @if (isCovered(t.key)) {
+                  <span class="w-5 h-5 rounded-full gb-gradient text-white flex items-center justify-center text-[11px] shrink-0 mt-0.5">✓</span>
+                } @else {
+                  <span class="w-5 h-5 rounded-full border border-gray-200 shrink-0 mt-0.5"></span>
+                }
+                <span [class.font-medium]="isCovered(t.key)" [class.text-gb-ink]="isCovered(t.key)">{{ t.label }}</span>
+              </li>
+            }
+          </ul>
+        </div>
+
+        @if (state()!.key_insights.length) {
+          <div class="gb-card p-5">
+            <h3 class="gb-display text-base mb-3">What I've learned</h3>
+            <ul class="space-y-2">
+              @for (ins of state()!.key_insights; track $index) {
+                <li class="flex gap-2 text-sm text-gray-600"><span class="text-gb-mint mt-0.5">&rarr;</span><span>{{ ins }}</span></li>
+              }
+            </ul>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</section>

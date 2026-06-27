@@ -1,0 +1,229 @@
+<section class="mx-auto max-w-5xl px-5 sm:px-8 py-10">
+  <div class="flex items-center justify-between gap-4 flex-wrap">
+    <div>
+      <div class="gb-chip mb-3"><span class="w-2 h-2 rounded-full gb-gradient"></span> Step 1 · Resume</div>
+      <h1 class="gb-headline text-4xl">Parse your resume</h1>
+    </div>
+    <app-disclaimer-banner />
+  </div>
+
+  @if (error()) {
+    <div class="mt-6 rounded-2xl bg-red-50 text-red-700 text-sm px-4 py-3 border border-red-100">{{ error() }}</div>
+  }
+
+  <!-- ================= UPLOAD ================= -->
+  @if (status() === 'upload' || status() === 'parsing') {
+    <div class="mt-8 gb-rise">
+      <label
+        (dragover)="$event.preventDefault(); dragOver.set(true)"
+        (dragleave)="dragOver.set(false)"
+        (drop)="onDrop($event)"
+        [class.border-gb-mint]="dragOver()"
+        class="block cursor-pointer rounded-3xl border-2 border-dashed border-gray-200 hover:border-gb-mint transition-colors p-12 text-center"
+      >
+        <input #fileInput type="file" class="hidden" accept=".pdf,.docx,.txt,.md,.png,.jpg,.jpeg,.webp"
+               (change)="pickFile(fileInput)" [disabled]="status() === 'parsing'" />
+        <div class="gb-gradient w-14 h-14 rounded-2xl flex items-center justify-center text-white mx-auto mb-5">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M6 10l6-6 6 6"/><path d="M4 20h16"/></svg>
+        </div>
+        @if (fileName) {
+          <p class="gb-display text-lg">{{ fileName }}</p>
+          <p class="text-gray-500 text-sm mt-1">Click to choose a different file</p>
+        } @else {
+          <p class="gb-display text-lg">Drop your resume here, or click to browse</p>
+          <p class="text-gray-500 text-sm mt-1">PDF, DOCX, TXT, or an image · up to 10&nbsp;MB</p>
+        }
+      </label>
+
+      <div class="mt-6 flex items-center gap-3">
+        <button class="gb-btn gb-lg group" [disabled]="!file || status() === 'parsing'" (click)="parse()">
+          @if (status() === 'parsing') {
+            <span class="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></span>
+            <span>Reading your resume…</span>
+          } @else {
+            <span>Parse resume</span> <span class="gb-arrow">&rarr;</span>
+          }
+        </button>
+        <span class="text-sm text-gray-400">Processed by AI to build your editable profile.</span>
+      </div>
+    </div>
+  }
+
+  <!-- ================= REVIEW ================= -->
+  @if ((status() === 'review' || status() === 'saving' || status() === 'saved') && profile; as p) {
+    <div class="mt-8 gb-rise space-y-6">
+      <div class="flex items-center justify-between gap-3 flex-wrap">
+        <p class="text-gray-500">Review and correct anything below — this becomes your living profile. <span class="text-gray-400">(v{{ version() }})</span></p>
+        <button class="gb-btn-ghost gb-sm" (click)="reupload()">Upload a different resume</button>
+      </div>
+
+      <!-- Uncertainty flags -->
+      @if (p.uncertainty_flags.length) {
+        <div class="rounded-3xl border border-gray-100 bg-gray-50 p-6">
+          <h3 class="gb-display text-lg mb-1">We'll clarify these in Discovery</h3>
+          <p class="text-gray-500 text-sm mb-4">The counselor spotted {{ p.uncertainty_flags.length }} thing(s) worth a closer look.</p>
+          <div class="grid sm:grid-cols-2 gap-3">
+            @for (f of p.uncertainty_flags; track trackByIndex($index)) {
+              <div class="rounded-2xl bg-white border border-gray-100 p-3.5">
+                <div class="flex items-center justify-between">
+                  <span class="font-semibold text-sm">{{ f.field }}</span>
+                  <span class="text-xs text-gray-400">{{ (f.confidence * 100) | number:'1.0-0' }}% sure</span>
+                </div>
+                <p class="text-sm text-gray-500 mt-1">{{ f.reason }}</p>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Basics -->
+      <div class="gb-card p-6">
+        <h3 class="gb-display text-lg mb-4">Basics</h3>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div><label class="gb-label">Name</label><input class="gb-input" [(ngModel)]="p.name" /></div>
+          <div><label class="gb-label">Headline</label><input class="gb-input" [(ngModel)]="p.headline" /></div>
+          <div><label class="gb-label">Email</label><input class="gb-input" [(ngModel)]="p.email" /></div>
+          <div><label class="gb-label">Phone</label><input class="gb-input" [(ngModel)]="p.phone" /></div>
+          <div><label class="gb-label">Location</label><input class="gb-input" [(ngModel)]="p.location" /></div>
+          <div><label class="gb-label">Total experience (years)</label><input type="number" step="0.1" class="gb-input" [(ngModel)]="p.total_experience_years" /></div>
+        </div>
+        <div class="mt-4"><label class="gb-label">Summary</label><textarea rows="3" class="gb-textarea" [(ngModel)]="p.summary"></textarea></div>
+      </div>
+
+      <!-- Preferences -->
+      <div class="gb-card p-6">
+        <h3 class="gb-display text-lg mb-4">Preferences &amp; constraints</h3>
+        <div class="grid sm:grid-cols-3 gap-4">
+          <div><label class="gb-label">Notice period</label><input class="gb-input" [(ngModel)]="p.preferences.notice_period" /></div>
+          <div><label class="gb-label">Current CTC</label><input class="gb-input" [(ngModel)]="p.preferences.current_ctc" /></div>
+          <div><label class="gb-label">Expected CTC</label><input class="gb-input" [(ngModel)]="p.preferences.expected_ctc" /></div>
+          <div>
+            <label class="gb-label">Remote preference</label>
+            <select class="gb-select" [(ngModel)]="p.preferences.remote_preference">
+              <option [ngValue]="null">—</option>
+              <option value="remote">Remote</option>
+              <option value="hybrid">Hybrid</option>
+              <option value="onsite">Onsite</option>
+              <option value="flexible">Flexible</option>
+            </select>
+          </div>
+          <div><label class="gb-label">Locations (comma-sep)</label><input class="gb-input" [ngModel]="listStr(p.preferences.locations)" (ngModelChange)="setPrefList('locations',$event)" name="locs" /></div>
+          <div><label class="gb-label">Target roles (comma-sep)</label><input class="gb-input" [ngModel]="listStr(p.preferences.target_roles)" (ngModelChange)="setPrefList('target_roles',$event)" name="roles" /></div>
+          <div><label class="gb-label">Company types (comma-sep)</label><input class="gb-input" [ngModel]="listStr(p.preferences.company_types)" (ngModelChange)="setPrefList('company_types',$event)" name="ctypes" /></div>
+          <div class="sm:col-span-2"><label class="gb-label">Priorities (comma-sep)</label><input class="gb-input" [ngModel]="listStr(p.preferences.priorities)" (ngModelChange)="setPrefList('priorities',$event)" name="prios" /></div>
+        </div>
+      </div>
+
+      <!-- Experience -->
+      <div class="gb-card p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="gb-display text-lg">Experience</h3>
+          <button class="gb-btn-ghost gb-sm" (click)="addExperience()">+ Add</button>
+        </div>
+        <div class="space-y-5">
+          @for (e of p.experiences; track trackByIndex($index)) {
+            <div class="rounded-2xl border border-gray-100 p-4">
+              <div class="grid sm:grid-cols-2 gap-3">
+                <div><label class="gb-label">Company</label><input class="gb-input" [(ngModel)]="e.company" name="co{{$index}}" /></div>
+                <div><label class="gb-label">Role</label><input class="gb-input" [(ngModel)]="e.role" name="ro{{$index}}" /></div>
+                <div><label class="gb-label">Client (if service co.)</label><input class="gb-input" [(ngModel)]="e.client" name="cl{{$index}}" /></div>
+                <div><label class="gb-label">Tech (comma-sep)</label><input class="gb-input" [ngModel]="techStr(e)" (ngModelChange)="setTech(e,$event)" name="te{{$index}}" /></div>
+                <div><label class="gb-label">Start</label><input class="gb-input" [(ngModel)]="e.start" name="st{{$index}}" /></div>
+                <div><label class="gb-label">End</label><input class="gb-input" [(ngModel)]="e.end" name="en{{$index}}" /></div>
+              </div>
+              <div class="mt-3">
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="gb-label mb-0!">Achievements</label>
+                  <button class="text-xs text-gb-mint font-semibold" (click)="addAchievement(e)">+ achievement</button>
+                </div>
+                <div class="space-y-2">
+                  @for (a of e.achievements; track trackByIndex($index)) {
+                    <div class="flex gap-2 items-center">
+                      <input class="gb-input flex-1" placeholder="What you did" [(ngModel)]="a.description" name="ad{{e.company}}{{$index}}" />
+                      <input class="gb-input w-44" placeholder="Metric (optional)" [(ngModel)]="a.metric" name="am{{e.company}}{{$index}}" />
+                      <button class="text-gray-300 hover:text-red-500 px-1" (click)="removeAchievement(e,$index)">✕</button>
+                    </div>
+                  }
+                </div>
+              </div>
+              <div class="mt-3 flex justify-end">
+                <button class="text-xs text-gray-400 hover:text-red-500" (click)="removeExperience($index)">Remove experience</button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Skills -->
+      <div class="gb-card p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="gb-display text-lg">Skills</h3>
+          <button class="gb-btn-ghost gb-sm" (click)="addSkill()">+ Add</button>
+        </div>
+        <div class="grid sm:grid-cols-2 gap-3">
+          @for (s of p.skills; track trackByIndex($index)) {
+            <div class="flex gap-2 items-center">
+              <input class="gb-input flex-1" placeholder="Skill" [(ngModel)]="s.name" name="sk{{$index}}" />
+              <select class="gb-select w-36" [(ngModel)]="s.proficiency" name="sp{{$index}}">
+                <option [ngValue]="null">—</option>
+                @for (lvl of proficiencies; track lvl) { <option [value]="lvl">{{ lvl }}</option> }
+              </select>
+              <button class="text-gray-300 hover:text-red-500 px-1" (click)="removeSkill($index)">✕</button>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Education -->
+      <div class="gb-card p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="gb-display text-lg">Education</h3>
+          <button class="gb-btn-ghost gb-sm" (click)="addEducation()">+ Add</button>
+        </div>
+        <div class="space-y-3">
+          @for (ed of p.education; track trackByIndex($index)) {
+            <div class="grid sm:grid-cols-4 gap-3 items-end">
+              <div class="sm:col-span-1"><label class="gb-label">Degree</label><input class="gb-input" [(ngModel)]="ed.degree" name="ed{{$index}}" /></div>
+              <div class="sm:col-span-1"><label class="gb-label">Institution</label><input class="gb-input" [(ngModel)]="ed.institution" name="ei{{$index}}" /></div>
+              <div><label class="gb-label">Year</label><input class="gb-input" [(ngModel)]="ed.year" name="ey{{$index}}" /></div>
+              <div class="flex gap-2 items-end">
+                <div class="flex-1"><label class="gb-label">Score</label><input class="gb-input" [(ngModel)]="ed.score" name="es{{$index}}" /></div>
+                <button class="text-gray-300 hover:text-red-500 pb-2" (click)="removeEducation($index)">✕</button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Career gaps -->
+      @if (p.career_gaps.length) {
+        <div class="gb-card p-6">
+          <h3 class="gb-display text-lg mb-4">Career gaps</h3>
+          <div class="space-y-3">
+            @for (g of p.career_gaps; track trackByIndex($index)) {
+              <div class="grid sm:grid-cols-3 gap-3">
+                <div><label class="gb-label">Dates</label><input class="gb-input" [(ngModel)]="g.dates" name="gd{{$index}}" /></div>
+                <div><label class="gb-label">Reason</label><input class="gb-input" [(ngModel)]="g.reason" name="gr{{$index}}" /></div>
+                <div><label class="gb-label">Activities during gap</label><input class="gb-input" [(ngModel)]="g.activities" name="ga{{$index}}" /></div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Actions -->
+      <div class="sticky bottom-0 -mx-5 sm:-mx-8 px-5 sm:px-8 py-4 bg-white/90 backdrop-blur border-t border-gray-100 flex items-center justify-between gap-3 flex-wrap">
+        <div class="text-sm">
+          @if (status() === 'saved') { <span class="text-gb-mint font-semibold">✓ Profile saved.</span> }
+          @else { <span class="text-gray-400">Your edits are saved when you continue.</span> }
+        </div>
+        <div class="flex gap-3">
+          <button class="gb-btn-ghost" [disabled]="status() === 'saving'" (click)="save(false)">Save</button>
+          <button class="gb-btn group" [disabled]="status() === 'saving'" (click)="save(true)">
+            @if (status() === 'saving') { <span>Saving…</span> } @else { <span>Save &amp; continue to Discovery</span> <span class="gb-arrow">&rarr;</span> }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</section>

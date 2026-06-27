@@ -1,0 +1,147 @@
+# ============================================================
+# Secrets & environment
+# ============================================================
+**/.env
+**/.env.*
+!**/.env.example
+*.pem
+*.key
+*.p12
+
+# ============================================================
+# Python
+# ============================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.Python
+
+# Build / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+MANIFEST
+.eggs/
+
+# Testing & coverage
+.pytest_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+*.cover
+
+# Type checkers
+.mypy_cache/
+.dmypy.json
+.pytype/
+.pyre/
+
+# Databases / local storage
+*.db
+*.sqlite3
+*.sqlite
+
+# Jupyter
+.ipynb_checkpoints/
+
+# ============================================================
+# Node / Angular
+# ============================================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Angular build output & cache
+frontend/dist/
+frontend/.angular/
+dist/
+.angular/
+out-tsc/
+
+# ============================================================
+# Editor & IDE
+# ============================================================
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.sublime-workspace
+.history/
+
+# ============================================================
+# OS generated
+# ============================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ============================================================
+# Logs & temp files
+# ============================================================
+*.log
+logs/
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+
+# ============================================================
+# ML / embedding model caches
+# ============================================================
+.fastembed_cache/
+*.onnx
+models/
+
+# ============================================================
+# Playwright / browser automation
+# ============================================================
+.playwright-mcp/
+test-results/
+playwright-report/
+playwright/.cache/
+
+# ============================================================
+# Docker
+# ============================================================
+*.dockerignore
+
+# ============================================================
+# Miscellaneous
+# ============================================================
+*.pid
+*.seed
+*.pid.lock
+.cache/
+.parcel-cache/
+

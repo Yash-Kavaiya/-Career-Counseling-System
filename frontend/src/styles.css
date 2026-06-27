@@ -1,0 +1,201 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Globant "Green Book" design tokens
+   White-predominant canvas · bright-green gradient accents ·
+   near-black #111 text · bold display sans · forward-arrow motif.
+   ============================================================ */
+@theme {
+  --color-gb-spring: #00e676;
+  --color-gb-mint: #00c853;
+  --color-gb-lime: #64dd17;
+  --color-gb-ink: #111111;
+  --color-gb-canvas: #ffffff;
+  --color-gb-mist: #f8fafc;
+
+  --font-display: "Space Grotesk", system-ui, -apple-system, sans-serif;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+:root {
+  --gb-gradient: linear-gradient(135deg, #00e676 0%, #00c853 50%, #64dd17 100%);
+  --ease-gb: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-gb-ink);
+  background: #ffffff;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ---- Display type ---- */
+.gb-display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.gb-headline {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+}
+
+/* ---- Signature green ---- */
+.gb-gradient {
+  background: var(--gb-gradient);
+}
+.gb-gradient-text {
+  background: linear-gradient(90deg, #00e676, #64dd17);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ---- Buttons ---- */
+.gb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+  border-radius: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--gb-gradient);
+  cursor: pointer;
+  transition: filter 0.2s var(--ease-gb), box-shadow 0.3s var(--ease-gb),
+    transform 0.2s var(--ease-gb);
+}
+.gb-btn:hover:not(:disabled) {
+  filter: brightness(1.05);
+  box-shadow: 0 12px 26px -10px rgba(0, 200, 83, 0.55);
+}
+.gb-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.gb-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.gb-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  color: var(--color-gb-ink);
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: background 0.2s var(--ease-gb), border-color 0.2s var(--ease-gb);
+}
+.gb-btn-ghost:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+.gb-btn.gb-sm,
+.gb-btn-ghost.gb-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+.gb-btn.gb-lg,
+.gb-btn-ghost.gb-lg {
+  padding: 1rem 2rem;
+  font-size: 1.075rem;
+}
+
+/* ---- Forward-arrow motif (wrap trigger in .group) ---- */
+.gb-arrow {
+  transition: transform 0.3s var(--ease-gb);
+}
+.group:hover .gb-arrow {
+  transform: translateX(6px);
+}
+
+/* ---- Cards ---- */
+.gb-card {
+  background: #fff;
+  border: 1px solid #f1f1f3;
+  border-radius: 1.5rem;
+  transition: transform 0.3s var(--ease-gb), box-shadow 0.3s var(--ease-gb),
+    border-color 0.3s var(--ease-gb);
+}
+.gb-card-hover:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  border-color: rgba(0, 230, 118, 0.3);
+}
+
+/* ---- Pills / chips ---- */
+.gb-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 1.5rem;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  background: #f3f4f6;
+}
+
+/* ---- Form controls ---- */
+.gb-input,
+.gb-textarea,
+.gb-select {
+  width: 100%;
+  border-radius: 0.9rem;
+  border: 1px solid #e5e7eb;
+  padding: 0.55rem 0.8rem;
+  outline: none;
+  background: #fff;
+  font-size: 0.95rem;
+  color: var(--color-gb-ink);
+  transition: border-color 0.15s var(--ease-gb), box-shadow 0.15s var(--ease-gb);
+}
+.gb-input:focus,
+.gb-textarea:focus,
+.gb-select:focus {
+  border-color: var(--color-gb-mint);
+  box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.18);
+}
+.gb-label {
+  display: block;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 0.3rem;
+  letter-spacing: 0.01em;
+}
+
+/* ---- Motion ---- */
+@keyframes gb-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.gb-rise {
+  animation: gb-rise 0.5s var(--ease-gb) both;
+}
+
+/* ---- Scrollbar (subtle) ---- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}

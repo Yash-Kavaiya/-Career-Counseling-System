@@ -1,0 +1,106 @@
+<section class="mx-auto max-w-6xl px-5 sm:px-8 py-10">
+  <div class="flex items-center justify-between gap-3 flex-wrap mb-6">
+    <div>
+      <div class="gb-chip mb-2"><span class="w-2 h-2 rounded-full gb-gradient"></span> Step 3 · Assessment</div>
+      <h1 class="gb-headline text-3xl sm:text-4xl">Strengths &amp; gaps</h1>
+    </div>
+    <app-disclaimer-banner />
+  </div>
+
+  @if (error()) {
+    <div class="mb-5 rounded-2xl bg-red-50 text-red-700 text-sm px-4 py-3 border border-red-100">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="py-20 text-center text-gray-400">Loading…</div>
+  } @else if (noProfile()) {
+    <div class="gb-card p-10 text-center max-w-xl mx-auto">
+      <h2 class="gb-display text-xl mb-2">First, add your resume</h2>
+      <p class="text-gray-500 mb-6">Your assessment is built from your profile and discovery conversation.</p>
+      <a routerLink="/resume" class="gb-btn group">Go to resume <span class="gb-arrow">&rarr;</span></a>
+    </div>
+  } @else if (!assessment()) {
+    <div class="gb-card p-10 text-center max-w-2xl mx-auto gb-rise">
+      <h2 class="gb-display text-xl mb-2">Generate your assessment</h2>
+      <p class="text-gray-500 mb-6 max-w-md mx-auto">We'll weigh your resume and everything from discovery into an honest, evidence-based read of your fit — with a skill radar against your target role.</p>
+      <button class="gb-btn gb-lg group" [disabled]="running()" (click)="run()">
+        @if (running()) { <span>Assessing…</span> } @else { <span>Run assessment</span> <span class="gb-arrow">&rarr;</span> }
+      </button>
+    </div>
+  } @else {
+    <div class="gb-rise space-y-6">
+      <!-- Header -->
+      <div class="gb-card p-6 flex flex-col sm:flex-row items-center gap-6">
+        <div class="relative w-28 h-28 shrink-0">
+          <svg viewBox="0 0 100 100" class="w-28 h-28 -rotate-90">
+            <defs>
+              <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#00E676"/><stop offset="50%" stop-color="#00C853"/><stop offset="100%" stop-color="#64DD17"/>
+              </linearGradient>
+            </defs>
+            <circle cx="50" cy="50" r="42" fill="none" stroke="#eef0f2" stroke-width="9"/>
+            <circle cx="50" cy="50" r="42" fill="none" stroke="url(#ring)" stroke-width="9" stroke-linecap="round"
+                    stroke-dasharray="264" [attr.stroke-dashoffset]="264 - 264 * assessment()!.readiness_score / 100"/>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="gb-display text-3xl leading-none">{{ assessment()!.readiness_score }}</span>
+            <span class="text-[11px] text-gray-400">readiness</span>
+          </div>
+        </div>
+        <div class="text-center sm:text-left">
+          <div class="gb-chip mb-2">Target: {{ assessment()!.target_role }} · {{ assessment()!.level }}</div>
+          <p class="text-gray-600 text-lg leading-relaxed">{{ assessment()!.summary }}</p>
+        </div>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-6">
+        <!-- Radar -->
+        <div class="gb-card p-6">
+          <h3 class="gb-display text-lg mb-2">Skill radar <span class="text-sm font-normal text-gray-400">· you vs target</span></h3>
+          <div class="h-80"><app-radar-chart [axes]="assessment()!.radar" /></div>
+        </div>
+
+        <!-- Strengths -->
+        <div class="gb-card p-6">
+          <h3 class="gb-display text-lg mb-4">Strengths</h3>
+          <div class="space-y-3">
+            @for (s of assessment()!.strengths; track $index) {
+              <div class="rounded-2xl border border-gray-100 p-4">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="w-5 h-5 rounded-full gb-gradient text-white flex items-center justify-center text-[11px]">✓</span>
+                  <span class="font-semibold">{{ s.title }}</span>
+                </div>
+                <p class="text-sm text-gray-500 pl-7">{{ s.evidence }}</p>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Gaps -->
+      <div class="gb-card p-6">
+        <h3 class="gb-display text-lg mb-4">Prioritized gaps</h3>
+        <div class="grid md:grid-cols-2 gap-4">
+          @for (g of assessment()!.gaps; track $index) {
+            <div class="rounded-2xl border border-gray-100 p-4">
+              <div class="flex items-center justify-between gap-2 mb-2">
+                <span class="font-semibold">{{ g.title }}</span>
+                <span class="text-xs font-semibold px-2.5 py-1 rounded-full" [class]="severityClass(g.severity)">{{ g.severity }}</span>
+              </div>
+              <p class="text-sm text-gray-600 mb-2"><span class="text-gray-400">Impact:</span> {{ g.business_impact }}</p>
+              <p class="text-sm text-gb-ink"><span class="text-gb-mint font-medium">First step:</span> {{ g.how_to_close }}</p>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center justify-between gap-3 flex-wrap">
+        <button class="gb-btn-ghost gb-sm" [disabled]="running()" (click)="run()">
+          @if (running()) { <span>Regenerating…</span> } @else { <span>Regenerate</span> }
+        </button>
+        <a routerLink="/jobs" class="gb-btn group">See job matches <span class="gb-arrow">&rarr;</span></a>
+      </div>
+    </div>
+  }
+</section>

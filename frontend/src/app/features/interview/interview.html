@@ -1,0 +1,112 @@
+<section class="mx-auto max-w-6xl px-5 sm:px-8 py-8">
+  <div class="flex items-center justify-between gap-3 flex-wrap mb-6">
+    <div>
+      <div class="gb-chip mb-2"><span class="w-2 h-2 rounded-full gb-gradient"></span> Step 5 · Mock interview</div>
+      <h1 class="gb-headline text-3xl sm:text-4xl">Practice, with real feedback</h1>
+    </div>
+    @if (state()) {
+      <a routerLink="/roadmap" class="gb-btn-ghost gb-sm group">Build roadmap <span class="gb-arrow">&rarr;</span></a>
+    }
+  </div>
+
+  @if (error()) {
+    <div class="mb-5 rounded-2xl bg-red-50 text-red-700 text-sm px-4 py-3 border border-red-100">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="py-20 text-center text-gray-400">Loading…</div>
+  } @else if (noProfile()) {
+    <div class="gb-card p-10 text-center max-w-xl mx-auto">
+      <h2 class="gb-display text-xl mb-2">First, add your resume</h2>
+      <p class="text-gray-500 mb-6">Your mock interview is tailored to your profile and target role.</p>
+      <a routerLink="/resume" class="gb-btn group">Go to resume <span class="gb-arrow">&rarr;</span></a>
+    </div>
+  } @else if (!state()) {
+    <div class="gb-card p-10 text-center max-w-2xl mx-auto gb-rise">
+      <h2 class="gb-display text-xl mb-2">Ready for a realistic round?</h2>
+      <p class="text-gray-500 mb-6 max-w-md mx-auto">Adaptive technical + behavioural questions for your target role. Each answer gets scored on a real rubric with a stronger-answer outline.</p>
+      <button class="gb-btn gb-lg group" [disabled]="starting()" (click)="start()">
+        @if (starting()) { <span>Setting up…</span> } @else { <span>Start mock interview</span> <span class="gb-arrow">&rarr;</span> }
+      </button>
+    </div>
+  } @else {
+    <div class="grid lg:grid-cols-3 gap-6">
+      <!-- Chat -->
+      <div class="lg:col-span-2 gb-card flex flex-col h-[70vh]">
+        <div class="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
+          <span class="text-sm text-gray-500">Interviewing for <span class="font-semibold text-gb-ink">{{ state()!.target_role }}</span></span>
+          <span class="text-sm text-gray-400">{{ feedbacks().length }} answered</span>
+        </div>
+        <div #scroller class="flex-1 overflow-y-auto p-5 space-y-4">
+          @for (m of messages(); track $index) {
+            @if (m.role === 'assistant') {
+              <div class="flex gap-3">
+                <span class="gb-gradient w-8 h-8 rounded-xl flex items-center justify-center text-white text-sm shrink-0 mt-0.5">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/></svg>
+                </span>
+                <div class="max-w-[85%] rounded-2xl rounded-tl-sm bg-gray-50 border border-gray-100 px-4 py-2.5 text-[15px] leading-relaxed whitespace-pre-wrap">{{ m.content }}@if (streaming() && $last && !m.content) {<span class="text-gray-400">thinking…</span>}</div>
+              </div>
+            } @else {
+              <div class="flex justify-end">
+                <div class="max-w-[85%] rounded-2xl rounded-tr-sm gb-gradient text-white px-4 py-2.5 text-[15px] leading-relaxed whitespace-pre-wrap">{{ m.content }}</div>
+              </div>
+            }
+          }
+        </div>
+        <div class="border-t border-gray-100 p-3">
+          <form (ngSubmit)="send()" class="flex items-end gap-2">
+            <textarea [(ngModel)]="draft" name="draft" rows="2"
+              (keydown.enter)="$event.preventDefault(); send()"
+              [disabled]="streaming()" placeholder="Type your answer…"
+              class="gb-textarea resize-none max-h-40"></textarea>
+            <button type="submit" class="gb-btn shrink-0" [disabled]="streaming() || !draft.trim()">
+              @if (streaming()) { <span class="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></span> }
+              @else { <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg> }
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="space-y-5">
+        <div class="gb-card p-5 text-center">
+          <div class="gb-display text-4xl">{{ readiness() }}<span class="text-lg text-gray-400">/100</span></div>
+          <div class="text-sm text-gray-400">interview readiness</div>
+        </div>
+
+        @if (latestFeedback(); as fb) {
+          <div class="gb-card p-5 gb-rise">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="gb-display text-base">Last answer</h3>
+              <span class="gb-chip" [class.gb-gradient]="fb.overall >= 7" [class.text-white]="fb.overall >= 7">{{ fb.overall }}/10</span>
+            </div>
+            <div class="space-y-2 mb-4">
+              @for (row of rubricRows; track row.key) {
+                <div>
+                  <div class="flex justify-between text-xs mb-0.5"><span class="text-gray-500">{{ row.label }}</span><span class="text-gray-400">{{ fb.scores[row.key] }}</span></div>
+                  <div class="h-1.5 rounded-full bg-gray-100 overflow-hidden"><div class="h-full rounded-full transition-all" [class]="scoreColor(fb.scores[row.key])" [style.width.%]="fb.scores[row.key] * 10"></div></div>
+                </div>
+              }
+            </div>
+            @if (fb.improvements.length) {
+              <div class="mb-3">
+                <div class="text-xs font-semibold text-gray-500 mb-1">To improve</div>
+                <ul class="space-y-1 text-sm text-gray-600">
+                  @for (im of fb.improvements; track $index) { <li class="flex gap-1.5"><span class="text-amber-500">!</span><span>{{ im }}</span></li> }
+                </ul>
+              </div>
+            }
+            @if (fb.better_answer) {
+              <div>
+                <div class="text-xs font-semibold text-gb-mint mb-1">A stronger answer</div>
+                <p class="text-sm text-gray-600 whitespace-pre-wrap">{{ fb.better_answer }}</p>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="gb-card p-5 text-sm text-gray-400">Answer the first question to see rubric-based feedback here.</div>
+        }
+      </div>
+    </div>
+  }
+</section>

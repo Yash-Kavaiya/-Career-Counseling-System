@@ -1,0 +1,111 @@
+<section class="mx-auto max-w-4xl px-5 sm:px-8 py-10">
+  <div class="flex items-center justify-between gap-3 flex-wrap mb-6">
+    <div>
+      <div class="gb-chip mb-2"><span class="w-2 h-2 rounded-full gb-gradient"></span> Step 6 · Roadmap</div>
+      <h1 class="gb-headline text-3xl sm:text-4xl">Your learning roadmap</h1>
+    </div>
+    <app-disclaimer-banner />
+  </div>
+
+  @if (error()) {
+    <div class="mb-5 rounded-2xl bg-red-50 text-red-700 text-sm px-4 py-3 border border-red-100">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="py-20 text-center text-gray-400">Loading…</div>
+  } @else if (needs() === 'resume') {
+    <div class="gb-card p-10 text-center max-w-xl mx-auto">
+      <h2 class="gb-display text-xl mb-2">Add your resume first</h2>
+      <a routerLink="/resume" class="gb-btn group mt-3">Go to resume <span class="gb-arrow">&rarr;</span></a>
+    </div>
+  } @else if (needs() === 'assessment') {
+    <div class="gb-card p-10 text-center max-w-xl mx-auto">
+      <h2 class="gb-display text-xl mb-2">Run your assessment first</h2>
+      <p class="text-gray-500 mb-5">Your roadmap closes the gaps your assessment finds.</p>
+      <a routerLink="/assessment" class="gb-btn group">Go to assessment <span class="gb-arrow">&rarr;</span></a>
+    </div>
+  } @else if (!roadmap()) {
+    <div class="gb-card p-10 text-center max-w-2xl mx-auto gb-rise">
+      <h2 class="gb-display text-xl mb-2">Build your plan</h2>
+      <p class="text-gray-500 mb-6 max-w-md mx-auto">We'll turn your top gaps into a prioritized, time-boxed plan with resources and checkable milestones.</p>
+      <button class="gb-btn gb-lg group" [disabled]="generating()" (click)="generate()">
+        @if (generating()) { <span>Building…</span> } @else { <span>Generate roadmap</span> <span class="gb-arrow">&rarr;</span> }
+      </button>
+    </div>
+  } @else {
+    <div class="gb-rise space-y-6">
+      <!-- Progress -->
+      <div class="gb-card p-6">
+        <div class="flex items-center justify-between mb-1">
+          <p class="text-gray-600">Target: <span class="font-semibold">{{ roadmap()!.target_role }}</span></p>
+          <span class="text-sm text-gray-400">{{ doneMilestones() }}/{{ totalMilestones() }} milestones</span>
+        </div>
+        <p class="text-gray-500 text-sm mb-4">{{ roadmap()!.summary }}</p>
+        <div class="h-2.5 rounded-full bg-gray-100 overflow-hidden"><div class="h-full gb-gradient transition-all duration-500" [style.width.%]="progress()"></div></div>
+      </div>
+
+      <!-- Items -->
+      <div class="space-y-5">
+        @for (it of roadmap()!.items; track $index; let i = $index) {
+          <div class="gb-card p-6">
+            <div class="flex items-start gap-4">
+              <span class="gb-gradient w-9 h-9 rounded-2xl flex items-center justify-center text-white gb-display shrink-0">{{ it.priority }}</span>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-3 flex-wrap">
+                  <h3 class="gb-display text-lg">{{ it.title }}</h3>
+                  <span class="gb-chip text-xs">~{{ it.estimated_weeks }} weeks</span>
+                </div>
+                <p class="text-sm text-gray-600 mt-2"><span class="text-gray-400">Why:</span> {{ it.why_it_matters }}</p>
+                <p class="text-sm text-gray-700 mt-1"><span class="text-gb-mint font-medium">Do:</span> {{ it.action }}</p>
+
+                <!-- Resources -->
+                @if (it.resources.length) {
+                  <div class="mt-4">
+                    <div class="text-xs font-semibold text-gray-500 mb-1.5">Resources</div>
+                    <div class="flex flex-wrap gap-2">
+                      @for (r of it.resources; track $index) {
+                        @if (r.url) {
+                          <a [href]="r.url" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-2xl bg-gray-50 border border-gray-100 hover:border-gb-mint transition-colors">
+                            {{ r.name }}<span class="text-gray-300 text-xs">{{ r.type }}</span>@if (r.is_free) { <span class="text-gb-mint text-xs">free</span> }
+                          </a>
+                        } @else {
+                          <span class="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-2xl bg-gray-50 border border-gray-100">
+                            {{ r.name }}<span class="text-gray-300 text-xs">{{ r.type }}</span>@if (r.is_free) { <span class="text-gb-mint text-xs">free</span> }
+                          </span>
+                        }
+                      }
+                    </div>
+                  </div>
+                }
+
+                <!-- Milestones -->
+                @if (it.milestones.length) {
+                  <div class="mt-4">
+                    <div class="text-xs font-semibold text-gray-500 mb-1.5">Milestones</div>
+                    <ul class="space-y-1.5">
+                      @for (m of it.milestones; track $index; let j = $index) {
+                        <li>
+                          <label class="flex items-start gap-2.5 cursor-pointer text-sm" [class.text-gray-400]="m.done">
+                            <input type="checkbox" [checked]="m.done" (change)="toggle(i, j, $any($event.target).checked)" class="mt-0.5 accent-gb-mint w-4 h-4" />
+                            <span [class.line-through]="m.done">{{ m.title }}</span>
+                          </label>
+                        </li>
+                      }
+                    </ul>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="flex justify-between items-center gap-3 flex-wrap">
+        <button class="gb-btn-ghost gb-sm" [disabled]="generating()" (click)="generate()">
+          @if (generating()) { <span>Rebuilding…</span> } @else { <span>Regenerate</span> }
+        </button>
+        <a routerLink="/dashboard" class="gb-btn group">Back to journey <span class="gb-arrow">&rarr;</span></a>
+      </div>
+    </div>
+  }
+</section>

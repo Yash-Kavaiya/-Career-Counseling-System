@@ -1,0 +1,69 @@
+<section class="mx-auto max-w-7xl px-5 sm:px-8 py-12">
+  <!-- Hero -->
+  <div class="gb-rise">
+    <app-disclaimer-banner />
+    <h1 class="gb-headline text-4xl sm:text-5xl mt-5 mb-3">
+      Hi {{ firstName }} — let's move your career <span class="gb-gradient-text">forward.</span>
+    </h1>
+    <p class="text-gray-500 text-lg max-w-2xl">
+      Work through the journey below. Everything you share is remembered, so each step builds on the last.
+    </p>
+  </div>
+
+  <!-- Counselor + continuity -->
+  <div class="mt-8 gb-card gb-card-hover p-6 sm:p-7 flex flex-col sm:flex-row items-start sm:items-center gap-5 gb-rise">
+    <span class="gb-gradient w-12 h-12 rounded-2xl flex items-center justify-center text-white shrink-0">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </span>
+    <div class="flex-1 min-w-0">
+      <h3 class="gb-display text-lg">Talk to your counselor</h3>
+      @if (overview()?.latest_insight) {
+        <p class="text-gray-500 text-sm">Last time, we noted: <span class="text-gb-ink">{{ overview()!.latest_insight }}</span></p>
+      } @else {
+        <p class="text-gray-500 text-sm">Ask what to do next — grounded in your whole journey.</p>
+      }
+    </div>
+    @if (overview()?.readiness != null) {
+      <div class="text-center shrink-0">
+        <div class="gb-display text-2xl leading-none">{{ overview()!.readiness }}<span class="text-sm text-gray-400">/100</span></div>
+        <div class="text-[11px] text-gray-400">readiness</div>
+      </div>
+    }
+    <a routerLink="/counselor" class="gb-btn group shrink-0">Open counselor <span class="gb-arrow">&rarr;</span></a>
+  </div>
+
+  <!-- Journey grid -->
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
+    @for (step of steps; track step.path) {
+      <a [routerLink]="step.path" class="gb-card gb-card-hover group p-7 flex flex-col">
+        <div class="flex items-center justify-between mb-6">
+          @if (done(step.key)) {
+            <span class="gb-gradient w-11 h-11 rounded-2xl flex items-center justify-center text-white text-lg">✓</span>
+          } @else {
+            <span class="w-11 h-11 rounded-2xl flex items-center justify-center gb-display text-lg border border-gray-200 text-gray-400">{{ step.n }}</span>
+          }
+          <span class="text-gray-300 group-hover:text-gb-mint transition-colors gb-arrow text-xl">&rarr;</span>
+        </div>
+        <h3 class="gb-display text-xl mb-2">{{ step.title }}</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">{{ step.desc }}</p>
+        @if (step.key === 'discovery' && overview() && overview()!.discovery_turns > 0) {
+          <p class="text-xs text-gb-mint mt-3 font-medium">{{ overview()!.discovery_covered }}/{{ overview()!.discovery_total }} topics covered</p>
+        }
+        @if (step.key === 'roadmap' && overview()?.has_roadmap) {
+          <p class="text-xs text-gb-mint mt-3 font-medium">{{ overview()!.roadmap_done }}/{{ overview()!.roadmap_total }} milestones done</p>
+        }
+      </a>
+    }
+  </div>
+
+  <!-- Privacy / data controls -->
+  <div class="mt-10 pt-6 border-t border-gray-100 flex items-center justify-between gap-3 flex-wrap text-sm">
+    <p class="text-gray-400">Your data is yours. Export it, or delete everything anytime.</p>
+    <div class="flex gap-2">
+      <button class="gb-btn-ghost gb-sm" [disabled]="exporting()" (click)="exportData()">
+        @if (exporting()) { <span>Exporting…</span> } @else { <span>Export my data</span> }
+      </button>
+      <button class="gb-btn-ghost gb-sm text-red-600!" (click)="deleteData()">Delete my data</button>
+    </div>
+  </div>
+</section>

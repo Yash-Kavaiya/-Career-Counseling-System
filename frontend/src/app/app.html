@@ -1,0 +1,43 @@
+<div class="min-h-screen flex flex-col bg-white">
+  <nav class="sticky top-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur-lg">
+    <div class="mx-auto max-w-7xl px-5 sm:px-8 h-16 flex items-center justify-between gap-4">
+      <!-- Brand -->
+      <a routerLink="/" class="group flex items-center gap-2 shrink-0">
+        <span class="gb-gradient w-9 h-9 rounded-2xl flex items-center justify-center text-white">
+          <svg class="gb-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </span>
+        <span class="gb-display text-xl">career<span class="gb-gradient-text">.ai</span></span>
+      </a>
+
+      @if (isAuth()) {
+        <div class="hidden md:flex items-center gap-1 overflow-x-auto">
+          @for (item of nav; track item.path) {
+            <a
+              [routerLink]="item.path"
+              routerLinkActive="text-gb-ink! bg-gray-100"
+              class="px-3 py-2 rounded-2xl text-sm font-medium text-gray-500 hover:text-gb-ink hover:bg-gray-50 transition-colors whitespace-nowrap"
+            >{{ item.label }}</a>
+          }
+        </div>
+        <div class="flex items-center gap-3 shrink-0">
+          <span class="hidden lg:block text-sm text-gray-500 max-w-[14rem] truncate">{{ user()?.full_name || user()?.email }}</span>
+          <button (click)="logout()" class="gb-btn-ghost gb-sm">Sign out</button>
+        </div>
+      } @else {
+        <div class="flex items-center gap-3 shrink-0">
+          <a routerLink="/login" class="gb-btn-ghost gb-sm">Sign in</a>
+          <a routerLink="/register" class="gb-btn gb-sm group">
+            Get started
+            <span class="gb-arrow">&rarr;</span>
+          </a>
+        </div>
+      }
+    </div>
+  </nav>
+
+  <main class="flex-1 flex flex-col">
+    <router-outlet />
+  </main>
+</div>
